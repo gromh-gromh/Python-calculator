@@ -1,8 +1,15 @@
 import math
+import configparser
 
 
 def main():
     print('Добро пожаловать в очередной калькулятор')
+
+    global PARAMS
+
+    load_params()
+    check_params()
+
     while True:
         mode = input('Введите режим работы калькулятора (basics / array / help): ')
         select_mode(mode)
@@ -18,6 +25,7 @@ def select_mode(mode):
 
         r = calculate(operand1, operand2, act)
         print("Результат: ", r)
+        write_log(operand1, operand2, act = act, result = r)
     elif mode == 'array':
         print('Вы выбрали режим действий с массивом')
 
@@ -30,6 +38,7 @@ def select_mode(mode):
         act = input("Введите действие: ")
 
         r = array_calculate(*array, act = act)
+        write_log(array, act = act, result = r)
         print("Результат: ", r)
     elif mode == 'help':
         print('Список доступнух действий:')
@@ -56,8 +65,7 @@ def calculate(op1, op2, act):
         result = op1 * op2
     elif act == '/':
         if op2 != 0:
-            settings = precision_input()
-            result = round(op1 / op2, convert_precision(load_params(**settings)))
+            result = round(op1 / op2, convert_precision(PARAMS['precision']))
         else:
             result = 'деление на ноль невозможно'
     elif act == '^':
@@ -67,8 +75,7 @@ def calculate(op1, op2, act):
             result = 'Невозможно возвести в нецелую степень'
     elif act == 'log':
         if op2 > 0:
-            settings = precision_input()
-            result = round(math.log(op1, op2), convert_precision(load_params(**settings)))
+            result = round(math.log(op1, op2), convert_precision(check_params(PARAMS['precision'])))
         else:
             result = 'Неправильное основание логарифма'
     else:
@@ -79,8 +86,7 @@ def calculate(op1, op2, act):
 #Функция с действиями с массивами
 def array_calculate(*array, act):
     if act == 'std_dev':
-        settings = precision_input()
-        result = standart_deviation(*array, precision = load_params(**settings))
+        result = standart_deviation(*array, precision = check_params(PARAMS['precision']))
     elif act == 'two_sum':
         result = two_sum(*array)
     else:
@@ -119,12 +125,6 @@ def two_sum(*lst):
             pairs.append(pair)
     return pairs  
 
-#Функция ввода точности вычислений
-def precision_input():
-    print('Введите точность выбранного вычисления')
-    precision = input()
-    settings = {'precision': precision}
-    return settings
 
 #Функция для конвертации значения точности из float в int
 def convert_precision(precision=None):
@@ -135,14 +135,36 @@ def convert_precision(precision=None):
             return i
 
 #Функция для загрузки параметров
-def load_params(**kwargs):
-    precision = kwargs['precision']
-    try:
-        precision = float(precision)
-    except  Exception:
-        precision = '0.00001'
+def load_params():
+    print('Загрузка параметров...')
 
-    return precision
+    config = configparser.ConfigParser()
+    config.read('params.ini')
+    params_tuples_list = config.items('DEFAULT')
+
+    global PARAMS
+    PARAMS = {i[0] : i[1] for i in params_tuples_list}
+
+    print('Параметры загружены:')    
+    print(PARAMS)
+
+
+#Функция для проверки параметров
+def check_params():
+    global PARAMS
+    for i in PARAMS:
+        if i == 'precision':
+            try:
+                PARAMS[i] = float(PARAMS[i])
+            except  Exception:
+                PARAMS[i] = '0.00001'
+
+#Функция для вывода логов вычислений
+def write_log(*args, act = None, result):
+    file = open(PARAMS['dest'] + PARAMS['output_type'], mode = 'a', errors = 'ignore')
+
+    file.write(f"{act} : {args} = {result} \n")
+    file.close()
  
 
 main()
