@@ -8,11 +8,13 @@ def main():
     global PARAMS
 
     load_params()
-    check_params()
 
-    while True:
-        mode = input('Введите режим работы калькулятора (basics / array / help): ')
-        select_mode(mode)
+    is_opened = True
+    while is_opened:
+        mode = input('Введите режим работы калькулятора (basics / array / help / exit): ')
+        is_opened = select_mode(mode)
+
+    input('Нажмите Enter чтобы выйти')
 
 #Функция выбора режима работы калькулятора
 def select_mode(mode):
@@ -26,6 +28,8 @@ def select_mode(mode):
         r = calculate(operand1, operand2, act)
         print("Результат: ", r)
         write_log(operand1, operand2, act = act, result = r)
+
+        return True
     elif mode == 'array':
         print('Вы выбрали режим действий с массивом')
 
@@ -40,6 +44,8 @@ def select_mode(mode):
         r = array_calculate(*array, act = act)
         write_log(array, act = act, result = r)
         print("Результат: ", r)
+
+        return True
     elif mode == 'help':
         print('Список доступнух действий:')
         print('|Режим арифметических действий с двумя числами:')
@@ -52,6 +58,10 @@ def select_mode(mode):
         print('|Режим действий с массивом')
         print('|--- std_dev среднеквадратическое отклонение')
         print('|--- two_sum поиск индексов пар чисел, сумма которых равна заданному числу')
+
+        return True
+    elif mode == 'exit':
+        return False
     else:
         print('Такого режима нет')
 
@@ -145,6 +155,8 @@ def load_params():
     global PARAMS
     PARAMS = {i[0] : i[1] for i in params_tuples_list}
 
+    check_params()
+
     print('Параметры загружены:')    
     print(PARAMS)
 
@@ -152,12 +164,16 @@ def load_params():
 #Функция для проверки параметров
 def check_params():
     global PARAMS
-    for i in PARAMS:
-        if i == 'precision':
-            try:
-                PARAMS[i] = float(PARAMS[i])
-            except  Exception:
-                PARAMS[i] = '0.00001'
+    try:
+        PARAMS['precision'] = float(PARAMS['precision'])
+    except  Exception:
+        PARAMS['precision'] = '0.00001'
+
+    if PARAMS['output_type'] == '':
+        PARAMS['output_type'] = '.txt'
+        
+    if PARAMS['dest'] == '':
+        PARAMS['dest'] = 'calc_log'
 
 #Функция для вывода логов вычислений
 def write_log(*args, act = None, result):
