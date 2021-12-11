@@ -96,7 +96,7 @@ def calculate(op1, op2, act):
 #Функция с действиями с массивами
 def array_calculate(*array, act):
     if act == 'std_dev':
-        result = standart_deviation(*array, precision = check_params(PARAMS['precision']))
+        result = standart_deviation(*array, precision = PARAMS['precision'])
     elif act == 'two_sum':
         result = two_sum(*array)
     else:
@@ -181,6 +181,7 @@ def write_log(*args, act = None, result):
 
     file.write(f"{act} : {args} = {result} \n")
     file.close()
+
  
 
 main()
