@@ -1,5 +1,6 @@
 import math
 import configparser
+from string import ascii_uppercase
 
 
 def main():
@@ -26,7 +27,7 @@ def select_mode(mode):
         act = input("Введите действие: ")
 
         r = calculate(operand1, operand2, act)
-        print("Результат: ", r)
+        print_calc(operand1, operand2, act = act, result = r, mode = mode)
         write_log(operand1, operand2, act = act, result = r)
 
         return True
@@ -42,8 +43,8 @@ def select_mode(mode):
         act = input("Введите действие: ")
 
         r = array_calculate(*array, act = act)
+        print_calc(*array, act = act, result = r, mode = mode)
         write_log(array, act = act, result = r)
-        print("Результат: ", r)
 
         return True
     elif mode == 'help':
@@ -182,6 +183,56 @@ def write_log(*args, act = None, result):
     file.write(f"{act} : {args} = {result} \n")
     file.close()
 
- 
+#Функция для табличного вывода результатов
+def print_calc(*args, act = None, result = None, mode = None):
+    raw_table = []
+    row_1 = []
+    row_2 = []
+    expression = ""
+
+    #Формирование массива, репрезентующего абстракцию таблицы
+    for i in range(0, len(args)):
+        row_1.append(ascii_uppercase[i])
+        row_2.append(args[i])
+    
+    if(mode == "array"):
+        expression = f"{act}("
+        for i in range(0, len(row_1)):
+            expression += f"{row_1[i]}, "
+        expression = expression[:-2] + ")"
+    if(mode == "basics"):
+        for i in range(0, len(row_1)):
+            expression += f"{row_1[i]} {act} "
+        expression = expression[:-3]
+
+    row_1.append(expression)
+    row_2.append(result)
+    raw_table = [row_1, row_2]
+
+    #Приведение массива к табличному виду
+    formated_row_1 = ""
+    formated_row_2 = ""
+
+    for i in range(0, len(raw_table[0])):
+        if(len(str(raw_table[0][i])) > len(str(raw_table[1][i]))):
+            cell_1 = f"* {raw_table[0][i]} "
+            whitespace_length = (len(cell_1) - 1 - len(str(raw_table[1][i])))
+            cell_2 = "*" + " " * int(whitespace_length / 2) + str(raw_table[1][i]) + " " * (whitespace_length - int(whitespace_length / 2))
+        else:
+            cell_2 = f"* {raw_table[1][i]} "
+            whitespace_length = (len(cell_2) - 1 - len(str(raw_table[0][i])))
+            cell_1 = "*" + " " * int(whitespace_length / 2) + str(raw_table[0][i]) + " " * (whitespace_length - int(whitespace_length / 2))
+        formated_row_1 += cell_1
+        formated_row_2 += cell_2
+    formated_row_1 += "*"
+    formated_row_2 += "*"
+
+    #Вывод полученной таблицы
+    print("*" * len(formated_row_1))
+    print(formated_row_1)
+    print("*" * len(formated_row_1))
+    print(formated_row_2)
+    print("*" * len(formated_row_1))
+
 
 main()
