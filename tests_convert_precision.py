@@ -1,16 +1,18 @@
+import unittest
 from main import convert_precision
 
-def test_cp_with_1():
-  assert convert_precision('0.1') == 1, "Должна быть 1"
+
+class TestPrecisionFunc(unittest.TestCase):
+    def test_norm_vals(self):
+        self.assertEqual(convert_precision(0.000001), 6)
+        self.assertEqual(convert_precision(0.0001), 4)
+
+    def test_convertable_inp_value(self):
+        self.assertEqual(convert_precision("0.000001"), 6)
+
+    def test_type_error_raises(self):
+        with self.assertRaisesRegex(TypeError, 'неверный тип аргумента'):
+            convert_precision('0.000001a')
 
 
-def test_cp_with_2():
-  assert convert_precision('0.01') == 2, "Должно быть 2"
-
-
-def test_cp_with_5():
-  assert convert_precision('0.00001') == 5, "Должно быть 5"
-
-
-def test_cp_with_5_as_float():
-  assert convert_precision(0.00001) == 5, "Должно быть 5"
+unittest.main(verbosity=1) 

@@ -1,6 +1,7 @@
 import math
 import configparser
 from string import ascii_uppercase
+from n_min import n_min
 
 
 def main():
@@ -42,7 +43,7 @@ def select_mode(mode):
 
         act = input("Введите действие: ")
 
-        r = array_calculate(*array, act = act)
+        r = array_calculate(array = array.copy(), act = act)
         print_calc(*array, act = act, result = r, mode = mode)
         write_log(array, act = act, result = r)
 
@@ -59,6 +60,7 @@ def select_mode(mode):
         print('|Режим действий с массивом')
         print('|--- std_dev среднеквадратическое отклонение')
         print('|--- two_sum поиск индексов пар чисел, сумма которых равна заданному числу')
+        print('|--- n_min поиск наименьшего произведения n элементов массива')
 
         return True
     elif mode == 'exit':
@@ -95,11 +97,14 @@ def calculate(op1, op2, act):
     return result
 
 #Функция с действиями с массивами
-def array_calculate(*array, act):
+def array_calculate(array, act):
     if act == 'std_dev':
         result = standart_deviation(*array, precision = PARAMS['precision'])
     elif act == 'two_sum':
         result = two_sum(*array)
+    elif act == 'n_min':
+        n = int(input('Введите количество чисел в искомом произведении '))
+        result = n_min(lst = array, n = n)
     else:
         result = 'Такой операции нет'
         
